@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/esteban/Server/MemoryList.h
+iostream
+-
+stdlib.h
+-
+
+/home/esteban/Server/Server.cpp
+iostream
+-
+string.h
+-
+sys/socket.h
+-
+netinet/in.h
+-
+arpa/inet.h
+-
+unistd.h
+-
+thread
+-
+MemoryList.h
+/home/esteban/Server/MemoryList.h
+
