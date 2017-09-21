@@ -1,8 +1,11 @@
+
 #include <iostream>
 #include <string.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <ctype.h>
+//#include /home/esteban/RMGUI
 //#include <allegro.h>
 //#include <allegro_native_dialog.h>
 
@@ -14,6 +17,8 @@ int client;
 int portNum = 1500;
 int portNumHA = 1501;
 bool server = true;
+int largo;
+char elemento[80];
 
 bool conectarServer() {
     int bufsize = 1024;
@@ -52,107 +57,126 @@ bool conectarServer() {
     }
 }
 
+/*Inicialización de rmlib*/
 bool rm_init(int portNum, int portNumHA, char *ip, char *ipHA) {
     server = conectarServer();
     cout << server << endl;
     return server;
 }
 
+/*Encripta las entradas*/
+void encriptarFrase (){
+    int i;
+    int largo = strlen(elemento);
+
+    for(i=0 ; i<largo ; ++i){
+        //convierte las minuscalas a mayuscula.
+        *(elemento+i) = toupper(*(elemento+i));
+
+        //descarta los digitos
+        if(isalpha(*(elemento+i))){
+            //verifica los casos especiales X-Y-Z
+            if(*(elemento+i) > 87){
+                *(elemento+i) = *(elemento+i) - 23;
+            }
+            else{
+                *(elemento+i) = *(elemento+i) + 3;
+            }
+        }
+    } cout<< elemento << endl;
+    printf("La frase encriptada es: %s",elemento);
+}
+
+/*Envía la llave y el valor a los servidores para ser insertados en la memoria*/
 void sendData() {
     string valor;
     string llave;
     string tamano;
-    string ejecucion = "i-";
     int bufsize = 1024;
-    char buffer[bufsize];
+    char buffer=NULL;
+    *elemento=buffer;
     while (true) {
+        char buffer[bufsize];
+        string ejecucion = "i-";
         cin >> llave;
         ejecucion += llave;
         ejecucion += "-";
         cin >> valor;
         ejecucion += valor;
-        ejecucion += "-";
-        cin >> tamano;
-        ejecucion += tamano;
         strcpy(buffer, ejecucion.c_str());
+        buffer;
+        encriptarFrase();
         send(client, buffer, bufsize, 0);
         cout << buffer << endl;
     }
 }
 
+/*Envía la llave y el valor a los servidores para ser eliminados en la memoria*/
 void deleteData() {
     string valor;
     string llave;
     string tamano;
-    string ejecucion = "e-";
     int bufsize = 1024;
-    char buffer[bufsize];
+    char buffer=NULL;
+    *elemento=buffer;
     while (true) {
+        char buffer[bufsize];
+        string ejecucion = "e-";
         cin >> llave;
         ejecucion += llave;
         ejecucion += "-";
         cin >> valor;
         ejecucion += valor;
-        ejecucion += "-";
-        cin >> tamano;
-        ejecucion += tamano;
         strcpy(buffer, ejecucion.c_str());
+        buffer;
+        encriptarFrase();
         send(client, buffer, bufsize, 0);
         cout << buffer << endl;
     }
 }
 
+/*Envía la llave y el valor a los servidores para ser accesados en la memoria*/
 void searchData() {
     string valor;
     string llave;
     string tamano;
-    string ejecucion = "b-";
     int bufsize = 1024;
-    char buffer[bufsize];
+    char buffer=NULL;
+    *elemento=buffer;
     while (true) {
+        char buffer[bufsize];
+        string ejecucion = "b-";
         cin >> llave;
         ejecucion += llave;
         ejecucion += "-";
         cin >> valor;
         ejecucion += valor;
-        ejecucion += "-";
-        cin >> tamano;
-        ejecucion += tamano;
         strcpy(buffer, ejecucion.c_str());
+        buffer;
+        encriptarFrase();
         send(client, buffer, bufsize, 0);
         cout << buffer << endl;
     }
 }
 
-struct rmRef_h {
-    int referencias;
-    int dato;
-    int bytes;
-    string key;
-    struct rmRef_h *siguiente;
-};
-
-class operadores {
+/*Sobrecarga de los operadores =, ==, !=*/
+class sobrecargas{
 private:
     char *key;
 public:
-    operadores(char *llave) {
+    sobrecargas(char *llave) {
         this->key = llave;
     }
 
     int operator=(int var) {
-        char dato_concat[500];
-        dato_concat[0] = NULL;
+        char dato[500];
+        dato[0] = NULL;
         char *buffer = (char *) malloc(1024 * sizeof(char));
 
-        strcat(dato_concat, "b");
-        strcat(dato_concat, "-");
-        strcat(dato_concat, key);
-
-        strcpy(buffer, dato_concat);
-
+        strcat(dato, "b-");
+        strcat(dato, key);
+        strcpy(buffer, dato);
         send(client, buffer, 1024, 0);
-
         recv(client, buffer, 1024, 0);
         int num = atoi(buffer);
         free(buffer);
@@ -160,45 +184,35 @@ public:
     }
 
     bool operator==(char *llave) {
-        char dato_concat[500];
-        dato_concat[0] = NULL;
+        char dato[500];
+        dato[0] = NULL;
         char *buffer = (char *) malloc(1024 * sizeof(char));
 
-        strcat(dato_concat, "c");
-        strcat(dato_concat, "-");
-        strcat(dato_concat, key);
-
-        strcpy(buffer, dato_concat);
-
+        strcat(dato, "c-");
+        strcat(dato, key);
+        strcpy(buffer, dato);
         send(client, buffer, 1024, 0);
-
         recv(client, buffer, 1024, 0);
-
         if (strcmp(buffer, llave) == 0) {
             free(buffer);
             return true;
-        } else {
+        } else{
             free(buffer);
             return false;
         }
     }
 
-    bool operator!=(char *llave) {
-        char dato_concat[500];
-        dato_concat[0] = NULL;
+    bool operator!=(char *llave){
+        char dato[500];
+        dato[0] = NULL;
         char *buffer = (char *) malloc(1024 * sizeof(char));
 
-        strcat(dato_concat, "c");
-        strcat(dato_concat, "-");
-        strcat(dato_concat, key);
-
-        strcpy(buffer, dato_concat);
-
+        strcat(dato, "c-");
+        strcat(dato, key);
+        strcpy(buffer, dato);
         send(client, buffer, 1024, 0);
-
         recv(client, buffer, 1024, 0);
-
-        if (strcmp(buffer, llave) == 0) {
+        if (strcmp(buffer, llave) == 0){
             free(buffer);
             return false;
         } else {
@@ -208,9 +222,9 @@ public:
     }
 };
 
-int main() {
+int main(){
     rm_init(portNum, portNumHA, ip, ipHA);
-    //sendData();
-    searchData();
+    sendData();
+    //searchData();
     //deleteData();
 }

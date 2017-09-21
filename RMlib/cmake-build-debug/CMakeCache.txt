@@ -182,6 +182,12 @@ ProcessorCount_cmd_sysctl:FILEPATH=/sbin/sysctl
 Qt5Widgets_DIR:PATH=Qt5Widgets_DIR-NOTFOUND
 
 //Value Computed by CMake
+RMGUI_BINARY_DIR:STATIC=/home/esteban/RMlib/cmake-build-debug
+
+//Value Computed by CMake
+RMGUI_SOURCE_DIR:STATIC=/home/esteban/RMlib
+
+//Value Computed by CMake
 RMlib_BINARY_DIR:STATIC=/home/esteban/RMlib/cmake-build-debug
 
 //Value Computed by CMake
