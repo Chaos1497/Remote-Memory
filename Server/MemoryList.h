@@ -7,7 +7,7 @@ using namespace std;
 
 struct rmRef_h {
 
-    int referencias;
+    int contador;
     int dato;
     int bytes;
     string key;
@@ -40,9 +40,11 @@ void insertar(Tlista &lista, int valor, string llave, int largo){
 void buscarElemento(Tlista lista, int valor, string llave, int largo){
     Tlista q = lista;
     int i = 1, band = 0;
+    int contador=0;
 
     while(q!=NULL){
         if(q->dato==valor && q->key==llave && q->bytes==largo){
+            contador+=1;
             cout<<endl<<" Encontrada en posicion "<< i <<endl;
             band = 1;
         }
@@ -50,7 +52,7 @@ void buscarElemento(Tlista lista, int valor, string llave, int largo){
         i++;
     }
     if(band==0)
-        cout<<"\n\n Numero no encontrado..!"<< endl;
+        cout<<"\n\n No existe la llave solicitada"<< endl;
 }
 
 void reportarLista(Tlista lista){
@@ -77,6 +79,7 @@ void eliminarElemento(Tlista &lista, int valor, string llave, int largo){
                     ant->siguiente = p->siguiente;
 
                 delete(p);
+                cout << "Elemento eliminado" << endl;
                 return;
             }
             ant = p;
@@ -93,7 +96,7 @@ bool garbageCollector(Tlista &lista){
 
     if(lista!=NULL){
         do{
-            if(p->referencias<=0){
+            if(p->contador<=0){
                 if(p==lista){
                     lista = lista->siguiente;
                 }else{

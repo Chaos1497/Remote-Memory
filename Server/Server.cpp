@@ -10,8 +10,28 @@
 using namespace std;
 
 Tlista *lista = new Tlista();
+Tlista *cache = new Tlista();
 
 int portNum = 1500;
+char *elemento;
+
+/*Desencripta las entradas*/
+void desencriptarFrase (){
+    int i;
+    int largo = strlen(elemento);
+
+    for(i=0 ; i<largo ; ++i) {
+        if(isalpha(*(elemento + i))) {
+            if(*(elemento+i) < 68) {
+                *(elemento+i)= *(elemento+i) + 23;
+            }
+            else {
+                *(elemento+i)= *(elemento+i) - 3;
+            }
+        }
+    }
+    printf("\n""La frase desencriptada es: %s",elemento);
+}
 
 void cliente(){
     /* -------------- INITIALIZING VARIABLES -------------- */
@@ -143,30 +163,37 @@ thread conectarCliente() {
         do{
             recv(server, buffer, bufsize, 0);
 
+            //elemento=buffer;
+            //desencriptarFrase();
+
             string var = buffer;
+            //desencriptarFrase();
 
             string comienzo = var.substr(0,2);
             string llave = var.substr(2,6);
 
-            string value = var.substr(9,6);
+            string value = var.substr(9);
             int valor = stoi(value);
 
-            string size = var.substr(16,6);
-            int tamano = stoi(size);
+            int tamano = sizeof(valor);
 
             if(comienzo=="e-"){
-                eliminarElemento(*lista,valor,llave,tamano);
-                strcpy(buffer,"Elemento eliminado");
-                send(server, buffer, bufsize,0);
-                cout << "Elemento eliminado" << endl;
-
+                if (lista==NULL){
+                    cout << "" <<endl;
+                }else {
+                    eliminarElemento(*lista, valor, llave, tamano);
+                    strcpy(buffer, "Elemento eliminado");
+                    send(server, buffer, bufsize, 0);
+                    cout << "Elemento eliminado" << endl;
+                    reportarLista(*lista);
+                }
             }
 
             if(comienzo=="i-"){
-
                 insertar(*lista,valor,llave,tamano);
                 cout << "Key insertada" << endl;
                 reportarLista(*lista);
+                cout << tamano << endl;
                 send(server, buffer, bufsize,0);
             }
 
@@ -174,7 +201,6 @@ thread conectarCliente() {
                 buscarElemento(*lista,valor,llave,tamano);
                 strcpy(buffer,"Elemento existente, devuelto");
                 send(server, buffer, bufsize,0);
-                cout << "Si existe, key devuelta" << endl;
             }
 
         }
@@ -307,5 +333,7 @@ int main(){
         }
         s1.join();
         s2.join();
+        this_thread::sleep_for(chrono::seconds(300));
+        garbageCollector(*lista);
     }
 }
