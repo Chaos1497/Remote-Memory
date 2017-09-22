@@ -5,9 +5,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <ctype.h>
-//#include /home/esteban/RMGUI
-//#include <allegro.h>
-//#include <allegro_native_dialog.h>
 
 using namespace std;
 
@@ -17,7 +14,6 @@ int client;
 int portNum = 1500;
 int portNumHA = 1501;
 bool server = true;
-int largo;
 char elemento[80];
 
 bool conectarServer() {
@@ -77,10 +73,10 @@ void encriptarFrase (){
         if(isalpha(*(elemento+i))){
             //verifica los casos especiales X-Y-Z
             if(*(elemento+i) > 87){
-                *(elemento+i) = *(elemento+i) - 23;
+                *(elemento+i) = *(elemento+i)-23;
             }
             else{
-                *(elemento+i) = *(elemento+i) + 3;
+                *(elemento+i) = *(elemento+i)+3;
             }
         }
     } cout<< elemento << endl;
