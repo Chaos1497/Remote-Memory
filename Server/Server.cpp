@@ -9,10 +9,11 @@
 
 using namespace std;
 
-Tlista *lista = new Tlista();
-Tlista *cache = new Tlista();
+Tlista *lista = new Tlista;
+Tlista *cache = new Tlista[5];
 
 int portNum = 1500;
+int portNumHA = 1501;
 char *elemento;
 
 /*Desencripta las entradas*/
@@ -21,12 +22,12 @@ void desencriptarFrase (){
     int largo = strlen(elemento);
 
     for(i=0 ; i<largo ; ++i) {
-        if(isalpha(*(elemento + i))) {
+        if(isalpha(*(elemento+i))) {
             if(*(elemento+i) < 68) {
-                *(elemento+i)= *(elemento+i) + 23;
+                *(elemento+i)= *(elemento+i)+23;
             }
             else {
-                *(elemento+i)= *(elemento+i) - 3;
+                *(elemento+i)= *(elemento+i)-3;
             }
         }
     }
@@ -75,8 +76,6 @@ void cliente(){
     cout << buffer << endl;
 
     cout << "- Connection confirmed, you are good to go!" << endl;
-    cout << "- Enter * to end the message" << endl;
-    cout << "- Enter # to end the connection\n" << endl;
     // loop to send messages to server
     do {
         cout << "Message: ";
@@ -161,14 +160,11 @@ thread conectarCliente() {
         send(server, buffer, bufsize, 0);
 
         do{
-            recv(server, buffer, bufsize, 0);
-
-            //elemento=buffer;
-            //desencriptarFrase();
+            recv(server, buffer, bufsize, 0); //recibe el buffer
 
             string var = buffer;
-            //desencriptarFrase();
 
+            //Se extraen distintas partes del buffer para separar la key y el valor
             string comienzo = var.substr(0,2);
             string llave = var.substr(2,6);
 
@@ -177,6 +173,7 @@ thread conectarCliente() {
 
             int tamano = sizeof(valor);
 
+            //condicional que elimina elementos
             if(comienzo=="e-"){
                 if (lista==NULL){
                     cout << "" <<endl;
@@ -189,14 +186,18 @@ thread conectarCliente() {
                 }
             }
 
+            //condicional que inserta elementos
             if(comienzo=="i-"){
                 insertar(*lista,valor,llave,tamano);
+                insertar(*cache,valor,llave,tamano);
                 cout << "Key insertada" << endl;
                 reportarLista(*lista);
+                reportarLista(*cache);
                 cout << tamano << endl;
                 send(server, buffer, bufsize,0);
             }
 
+            //condicional que busca elementos
             if(comienzo=="b-"){
                 buscarElemento(*lista,valor,llave,tamano);
                 strcpy(buffer,"Elemento existente, devuelto");
@@ -267,40 +268,48 @@ thread conectarCliente2() {
         send(server2, buffer, bufsize, 0);
 
         do{
-            recv(server2, buffer, bufsize, 0);
+            recv(server2, buffer, bufsize, 0); //recibe el buffer
 
             string var = buffer;
 
+            //Se extraen distintas partes del buffer para separar la key y el valor
             string comienzo = var.substr(0,2);
             string llave = var.substr(2,6);
 
-            string value = var.substr(9,6);
+            string value = var.substr(9);
             int valor = stoi(value);
 
-            string size = var.substr(16,6);
-            int tamano = stoi(size);
+            int tamano = sizeof(valor);
 
+            //condicional que elimina elementos
             if(comienzo=="e-"){
-                eliminarElemento(*lista,valor,llave,tamano);
-                strcpy(buffer,"Elemento eliminado");
-                send(server2, buffer, bufsize,0);
-                cout << "Elemento eliminado" << endl;
-
+                if (lista==NULL){
+                    cout << "" <<endl;
+                }else {
+                    eliminarElemento(*lista, valor, llave, tamano);
+                    strcpy(buffer, "Elemento eliminado");
+                    send(server2, buffer, bufsize, 0);
+                    cout << "Elemento eliminado" << endl;
+                    reportarLista(*lista);
+                }
             }
 
+            //condicional que inserta elementos
             if(comienzo=="i-"){
-
                 insertar(*lista,valor,llave,tamano);
+                insertar(*cache,valor,llave,tamano);
                 cout << "Key insertada" << endl;
                 reportarLista(*lista);
+                reportarLista(*cache);
+                cout << tamano << endl;
                 send(server2, buffer, bufsize,0);
             }
 
+            //condicional que busca elementos
             if(comienzo=="b-"){
                 buscarElemento(*lista,valor,llave,tamano);
                 strcpy(buffer,"Elemento existente, devuelto");
                 send(server2, buffer, bufsize,0);
-                cout << "Si existe, key devuelta" << endl;
             }
 
         }
@@ -318,6 +327,7 @@ thread conectarCliente2() {
 //******************************************************************************************************************
 
 int main(){
+    /*Se ejecutan los servidores por threads para prevenir el fallo de algun servidor*/
     thread s1(conectarCliente());
     thread s2(conectarCliente2());
     int activar_cliente=1;
@@ -327,6 +337,12 @@ int main(){
         cin>>activar_servidor2;
         if (activar_cliente==1){
             cin>> portNum;
+            thread s3(cliente);
+            s3.join();
+            activar_cliente=2;
+        }
+        else{
+            cin >> portNumHA;
             thread s3(cliente);
             s3.join();
             activar_cliente=2;

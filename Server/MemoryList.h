@@ -5,6 +5,7 @@
 #include <stdlib.h>
 using namespace std;
 
+/*Se inician los atributos para la lista*/
 struct rmRef_h {
 
     int contador;
@@ -15,8 +16,10 @@ struct rmRef_h {
     struct rmRef_h *siguiente;
 };
 
+/*Se crean los metodos de la lista*/
 typedef struct rmRef_h* Tlista;
 
+/*Función que inserta elementos en la lista*/
 void insertar(Tlista &lista, int valor, string llave, int largo){
 
     Tlista t, q = new(struct rmRef_h);
@@ -37,6 +40,7 @@ void insertar(Tlista &lista, int valor, string llave, int largo){
 
 }
 
+/*Función que busca elementos en la lista*/
 void buscarElemento(Tlista lista, int valor, string llave, int largo){
     Tlista q = lista;
     int i = 1, band = 0;
@@ -55,6 +59,7 @@ void buscarElemento(Tlista lista, int valor, string llave, int largo){
         cout<<"\n\n No existe la llave solicitada"<< endl;
 }
 
+/*Función que muestra la lista*/
 void reportarLista(Tlista lista){
     int i = 0;
 
@@ -65,7 +70,7 @@ void reportarLista(Tlista lista){
     }
 }
 
-
+/*Función que elimina elementos en la lista*/
 void eliminarElemento(Tlista &lista, int valor, string llave, int largo){
     Tlista p, ant;
     p = lista;
@@ -90,6 +95,7 @@ void eliminarElemento(Tlista &lista, int valor, string llave, int largo){
         cout<<" Lista vacia..!";
 }
 
+/*Función de recolector de basura*/
 bool garbageCollector(Tlista &lista){
     Tlista p, ant;
     p = lista;
