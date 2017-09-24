@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/esteban/Ejemplo/main.cpp
+iostream
+-
+stdlib.h
+-
+/home/esteban/RMlib/rmlib.cpp
+-
+
+/home/esteban/RMlib/rmlib.cpp
+iostream
+-
+string.h
+-
+sys/socket.h
+-
+netinet/in.h
+-
+arpa/inet.h
+-
+ctype.h
+-
+
