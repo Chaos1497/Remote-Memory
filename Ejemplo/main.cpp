@@ -1,5 +1,4 @@
 #include <iostream>
-#include <stdlib.h>
 #include "/home/esteban/RMlib/rmlib.cpp"
 
 using namespace std;
@@ -18,11 +17,11 @@ void menu(){
 }
 
 void guardar(){
-    cout<<"Ingrese el dato a guardar"<<endl;
+    cout<<"Ingrese la llave a guardar"<<endl;
     cout<<"Maximo 6 caracteres"<<endl;
     cout<<"Si faltan campos llénelos con espacios"<<endl;
     cin>>llave;
-    cout<<"Ingrese el cilindraje"<<endl;
+    cout<<"Ingrese el dato"<<endl;
     cin>>valor;
     while(true){
         sendData(llave,valor);
@@ -32,11 +31,11 @@ void guardar(){
 }
 
 void buscar(){
-    cout<<"Ingrese el dato a buscar"<<endl;
+    cout<<"Ingrese la llave a buscar"<<endl;
     cout<<"Maximo 6 caracteres"<<endl;
     cout<<"Si faltan campos llénelos con espacios"<<endl;
     cin>>llave;
-    cout<<"Ingrese el cilindraje"<<endl;
+    cout<<"Ingrese el dato"<<endl;
     cin>>valor;
     while(true){
         searchData(llave,valor);
@@ -46,11 +45,11 @@ void buscar(){
 }
 
 void eliminar(){
-    cout<<"Ingrese el dato a eliminar"<<endl;
+    cout<<"Ingrese la llave a eliminar"<<endl;
     cout<<"Maximo 6 caracteres"<<endl;
     cout<<"Si faltan campos llénelos con espacios"<<endl;
     cin>>llave;
-    cout<<"Ingrese el cilindraje"<<endl;
+    cout<<"Ingrese el dato"<<endl;
     cin>>valor;
     while(true){
         deleteData(llave,valor);
