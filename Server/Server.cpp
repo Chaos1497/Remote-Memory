@@ -1,16 +1,22 @@
 #include <iostream>
 #include <string.h>
+#include <string>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <thread>
+#include <mutex>
+#include <algorithm>
+#include "SFML/Graphics.hpp"
 #include "MemoryList.h"
 
 using namespace std;
 
 Tlista *lista = new Tlista;
 Tlista *cache = new Tlista[5];
+
+mutex mtx;
 
 int portNum = 1500;
 int portNumHA = 1501;
@@ -32,6 +38,41 @@ void desencriptarFrase (){
         }
     }
     printf("\n""La frase desencriptada es: %s",elemento);
+}
+
+int monitor(string Server, string cache, string memoria){
+
+    sf::RenderWindow window(sf::VideoMode(300, 100), "Monitor Server");
+    sf::Font font;
+    font.loadFromFile("arial.ttf");
+    sf::Text text1, text2, text3;
+    text1.setFont(font);
+    text2.setFont(font);
+    text3.setFont(font);
+    text1.setString("Servidor: "+Server);
+    text2.setString("\nMemoria Principal: "+memoria+" bytes" );
+    text3.setString("\n\nMemoria Cache: "+cache+" bytes");
+    text1.setColor(sf::Color::White);
+    text2.setColor(sf::Color::White);
+    text3.setColor(sf::Color::White);
+    text1.setCharacterSize(20);
+    text2.setCharacterSize(20);
+    text3.setCharacterSize(20);
+    while (window.isOpen()){
+        sf::Event event;
+        while (window.pollEvent(event)){
+            switch (event.type){
+                case sf::Event::Closed:
+                    window.close();
+                    break;
+            }
+        }
+        window.clear();
+        window.draw(text1);
+        window.draw(text2);
+        window.draw(text3);
+        window.display();
+    }
 }
 
 void cliente(){
@@ -103,6 +144,7 @@ void cliente(){
 
     close(client);
 }
+
 
 //******************************************************************************************************************
 //******************************************************************************************************************
@@ -181,7 +223,7 @@ thread conectarCliente() {
                     eliminarElemento(*lista, valor, llave, tamano);
                     strcpy(buffer, "Elemento eliminado");
                     send(server, buffer, bufsize, 0);
-                    cout << "Elemento eliminado" << endl;
+                    cout<< sizeof(*lista)<<endl;
                     reportarLista(*lista);
                 }
             }
@@ -189,21 +231,29 @@ thread conectarCliente() {
             //condicional que inserta elementos
             if(comienzo=="i-"){
                 insertar(*lista,valor,llave,tamano);
-                insertar(*cache,valor,llave,tamano);
                 cout << "Key insertada" << endl;
                 reportarLista(*lista);
-                reportarLista(*cache);
-                cout << tamano << endl;
+                cout<< sizeof(*lista)<<endl;
                 send(server, buffer, bufsize,0);
             }
 
             //condicional que busca elementos
             if(comienzo=="b-"){
+                mtx.lock();
                 buscarElemento(*lista,valor,llave,tamano);
                 strcpy(buffer,"Elemento existente, devuelto");
+                insertar(*cache,valor,llave,tamano);
+                reportarLista(*cache);
                 send(server, buffer, bufsize,0);
+                cout<< sizeof(*lista)<<endl;
+                cout<< sizeof(*cache)<<endl;
+                mtx.unlock();
             }
-
+            int tamacache = sizeof(*cache);
+            int tamamemoria= sizeof(*lista);
+            string Cache = to_string(tamacache);
+            string Memoria = to_string(tamamemoria);
+            monitor("Activo", Cache, Memoria);
         }
         while (*buffer != '*');
         cout << "\nConexión terminada "<<endl;
@@ -289,7 +339,7 @@ thread conectarCliente2() {
                     eliminarElemento(*lista, valor, llave, tamano);
                     strcpy(buffer, "Elemento eliminado");
                     send(server2, buffer, bufsize, 0);
-                    cout << "Elemento eliminado" << endl;
+                    cout<< sizeof(*lista)<<endl;
                     reportarLista(*lista);
                 }
             }
@@ -297,21 +347,29 @@ thread conectarCliente2() {
             //condicional que inserta elementos
             if(comienzo=="i-"){
                 insertar(*lista,valor,llave,tamano);
-                insertar(*cache,valor,llave,tamano);
                 cout << "Key insertada" << endl;
                 reportarLista(*lista);
-                reportarLista(*cache);
-                cout << tamano << endl;
+                cout<< sizeof(*lista)<<endl;
                 send(server2, buffer, bufsize,0);
             }
 
             //condicional que busca elementos
             if(comienzo=="b-"){
+                mtx.lock();
                 buscarElemento(*lista,valor,llave,tamano);
                 strcpy(buffer,"Elemento existente, devuelto");
+                insertar(*cache,valor,llave,tamano);
+                reportarLista(*cache);
                 send(server2, buffer, bufsize,0);
+                cout<< sizeof(*lista)<<endl;
+                cout<< sizeof(*cache)<<endl;
+                mtx.unlock();
             }
-
+            int tamacache = sizeof(*cache);
+            int tamamemoria= sizeof(*lista);
+            string Cache = to_string(tamacache);
+            string Memoria = to_string(tamamemoria);
+            monitor("Pasivo", Cache, Memoria);
         }
         while (*buffer != '*');
         cout << "\nConexión terminada "<<endl;
@@ -349,7 +407,8 @@ int main(){
         }
         s1.join();
         s2.join();
-        this_thread::sleep_for(chrono::seconds(300));
+        this_thread::sleep_for(chrono::seconds(60));
         garbageCollector(*lista);
+        break;
     }
 }

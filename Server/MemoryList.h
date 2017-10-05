@@ -12,7 +12,6 @@ struct rmRef_h {
     int dato;
     int bytes;
     string key;
-
     struct rmRef_h *siguiente;
 };
 
@@ -77,7 +76,8 @@ void eliminarElemento(Tlista &lista, int valor, string llave, int largo){
 
     if(lista!=NULL){
         while(p!=NULL){
-            if(p->key==llave){
+            if(p->key==llave && p->dato==valor && p->bytes==largo){
+                cout<<"El elemento existe"<<endl;
                 if(p==lista)
                     lista = lista->siguiente;
                 else
@@ -87,6 +87,7 @@ void eliminarElemento(Tlista &lista, int valor, string llave, int largo){
                 cout << "Elemento eliminado" << endl;
                 return;
             }
+            cout<<"El elemento no existe"<<endl;
             ant = p;
             p = p->siguiente;
         }
@@ -110,6 +111,7 @@ bool garbageCollector(Tlista &lista){
                 }
 
                 delete(p);
+                cout<<"Elemento eliminado por Garbage Collector"<<endl;
                 return true;
             }
             ant = p;
@@ -119,5 +121,55 @@ bool garbageCollector(Tlista &lista){
     else{
         false;}
 }
+
+void ordenarLista(Tlista lista){
+    Tlista actual , siguiente;
+    int contadorAux;
+    int datoAux;
+    int bytesAux;
+    string keyAux;
+
+    actual = lista;
+    while(actual->siguiente != NULL){
+     siguiente = actual->siguiente;
+
+     while (siguiente != NULL){
+         if (actual->dato > siguiente->dato){
+             contadorAux = siguiente->contador;
+             datoAux = siguiente->dato;
+             bytesAux = siguiente->bytes;
+             keyAux = siguiente->key;
+
+             siguiente->dato = actual->dato;
+             siguiente->key = actual->key;
+             siguiente->bytes = actual->bytes;
+             siguiente->contador = actual->contador;
+
+             actual->dato = datoAux;
+             actual->contador = contadorAux;
+             actual->bytes = bytesAux;
+             actual->key = keyAux;
+         }
+         siguiente = siguiente->siguiente;
+     }
+     actual = actual->siguiente;
+    }
+    cout<<"\n\n\tLista ordenada..."<<endl;
+}
+
+void intercambio(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void bubbleSort(int arr[], int n){
+    int i, j;
+    for (i = 0; i < n-1; i++)
+        for (j = 0; j < n-i-1; j++)
+            if (arr[j] > arr[j+1])
+                intercambio(&arr[j], &arr[j+1]);
+}
+
 
 #endif //SERVER_MEMORYLIST_H

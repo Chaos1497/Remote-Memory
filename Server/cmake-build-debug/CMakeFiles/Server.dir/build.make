@@ -90,6 +90,11 @@ Server_EXTERNAL_OBJECTS =
 
 Server: CMakeFiles/Server.dir/Server.cpp.o
 Server: CMakeFiles/Server.dir/build.make
+Server: /usr/lib/x86_64-linux-gnu/libsfml-system.so
+Server: /usr/lib/x86_64-linux-gnu/libsfml-graphics.so
+Server: /usr/lib/x86_64-linux-gnu/libsfml-window.so
+Server: /usr/lib/x86_64-linux-gnu/libsfml-network.so
+Server: /usr/lib/x86_64-linux-gnu/libsfml-audio.so
 Server: CMakeFiles/Server.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/esteban/Server/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable Server"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Server.dir/link.txt --verbose=$(VERBOSE)
